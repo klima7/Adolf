@@ -50,7 +50,3 @@ def get_best_memes(count, url_limit=None, page_limit=20):
     memes = _get_memes_until(url_limit, page_limit)
     memes.sort(reverse=True)
     return memes[:count]
-
-
-# print(fetch_memes_page(3))
-print(get_best_memes(5))
