@@ -10,9 +10,8 @@ def adolf():
 
 @adolf.command(help='Start Adolf bot')
 def run():
-    from app.bot import start_bot
     click.echo('Starting Adolf bot')
-    start_bot()
+    import app
 
 
 @adolf.command(help='Run all tests')

@@ -2,7 +2,7 @@ from os import environ
 import requests
 import json
 from enum import Enum, auto
-from app.translate import translate
+from app.util.translate import translate
 
 
 _AUTH_HEADER = {'x-api-key': environ.get('CATS_API_KEY')}
