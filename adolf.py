@@ -1,6 +1,6 @@
-from dotenv import load_dotenv
 import click
 import pytest
+from dotenv import load_dotenv
 
 
 @click.group()
