@@ -12,6 +12,7 @@ def adolf():
 def run():
     click.echo('Starting Adolf bot')
     import app
+    app.__name__
 
 
 @adolf.command(help='Run all tests')

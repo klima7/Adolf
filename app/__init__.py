@@ -19,4 +19,8 @@ def create_logger():
 logger = create_logger()
 client = AdolfBot(environ.get('MESSENGER_LOGIN'), environ.get('MESSENGER_PASSWORD'))
 logger.info('Login success')
+
+import app.events
+import app.regex
+
 client.listen()

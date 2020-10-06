@@ -1,5 +1,21 @@
 from collections import namedtuple
 from enum import Enum, IntEnum, auto
+from os import environ
+
+ELITE_GROUP_ID = environ.get('MESSENGER_THREAD_UID')
+PETTING_COUNT_REQUIRED = 6
+TIME_UPDATE_INTERVAL = 10
+
+ENOUGH_MARGIN = 60 * 6
+MAX_POOPY_VALUE = 10 * 60 * 6
+MAX_HUNGER_VALUE = 9 * 60 * 6
+MAX_THIRST_VALUE = 7 * 60 * 6
+MAX_BOREDOM_VALUE = 6 * 60 * 6
+
+STAT_HEARTS_COUNT = 6
+STAT_POSITIVE_CHARACTER = '❤'
+STAT_NEGATIVE_CHARACTER = '🖤'
+EATING_WILLINGNESS = 10
 
 something = namedtuple('something', 'name value')
 
