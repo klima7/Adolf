@@ -5,6 +5,7 @@ from app.texts import texts
 from app.policy import *
 from app.util import jbzd
 from app.memory import memory
+import app.util.cats as cats
 
 
 @decorators.register_regex("jak tam?")
@@ -98,3 +99,10 @@ def reply_petting(bot, message, author_id, thread_id, thread_type):
     bot.sendMessage(texts.start_petting, thread_id=thread_id, thread_type=thread_type)
     memory.petting_counter = PETTING_COUNT_REQUIRED
     memory.action = Action.PETTING
+
+
+@decorators.register_regex(r'\bkotki\b|^👋$')
+def reply_petting(bot, message, author_id, thread_id, thread_type):
+    cats_url = cats.get_random_cats(6, type=cats.CatType.STATIC)
+    bot.sendMessage("Kotki dla Ciebie 🐱🐱🐱", thread_id=thread_id, thread_type=thread_type)
+    bot.sendRemoteFiles(cats_url, thread_id=thread_id, thread_type=thread_type)

@@ -13,6 +13,7 @@ class DefaultMemory:
     petting_counter = 0
     emoji = ''
     memes_page = 1
+    memes_last_day_url = None
 
 
 class Memory:
