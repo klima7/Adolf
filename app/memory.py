@@ -1,39 +1,34 @@
-from configparser import *
+import shelve
+from app.policy import *
 
 
-class MemoryMixin:
+class DefaultMemory:
 
-    def __init__(self):
-        self.config = ConfigParser()
-        self.config['DEFAULT'] = self.MEMORY_DEFAULT
-        self.config.read(self.MEMORY_PATH)
-        self._remove_old_keys()
-        self._write()
+    hunger = MAX_HUNGER_VALUE // 2
+    thirst = MAX_THIRST_VALUE // 2
+    poopy = MAX_POOPY_VALUE // 2
+    boredom = MAX_BOREDOM_VALUE // 2
 
-    def __getitem__(self, item):
-        if self._is_proper_key(item):
-            return self.config['DEFAULT'][item]
-        raise KeyError(f'Key {item} is not in memory')
+    action = None
+    petting_counter = 0
+    emoji = ''
+    memes_page = 1
 
-    def __setitem__(self, key, value):
-        if not self._is_proper_key(key):
-            raise KeyError(f'Key {key} is not in memory')
-        self.config['DEFAULT'][key] = str(value)
-        self._write()
 
-    def get_mem(self, key, type=str):
-        return type(self[key])
+class Memory:
+    def __init__(self, path):
+        self.__dict__['data'] = shelve.open(path, 'c', writeback=False)
 
-    def _write(self):
-        with open(self.MEMORY_PATH, 'w') as f:
-            self.config.write(f)
+    def __setattr__(self, key, value):
+        self.__dict__['data'][key] = value
+        self.__dict__['data'].sync()
 
-    def _remove_old_keys(self):
-        for key in list(self.config['DEFAULT']):
-            if not self._is_proper_key(key):
-                del self.config['DEFAULT'][key]
-        self._write()
+    def __getattr__(self, item):
+        try:
+            val = self.__dict__['data'][item]
+        except KeyError:
+            val = getattr(DefaultMemory, item)
+        return val
 
-    def _is_proper_key(self, val):
-        return val in [key.lower() for key in self.MEMORY_DEFAULT]
 
+memory = Memory('resources/memory.shelve')

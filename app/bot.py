@@ -5,37 +5,19 @@ from random import choice
 import fbchat as fb
 
 import app.decorators as decorators
-from app.memory import MemoryMixin
+from app.memory import memory
 from app.policy import *
 from app.texts import texts
 
 logger = logging.getLogger('logger')
 
 
-class AdolfBot(fb.Client, MemoryMixin):
-
-    MEMORY_DEFAULT = {'memes_page': 1}
-    MEMORY_PATH = 'resources/memory.ini'
+class AdolfBot(fb.Client):
 
     def __init__(self, mail, password):
         fb.Client.__init__(self, mail, password, logging_level=logging.WARNING)
-        MemoryMixin.__init__(self)
-
-        # state
-        self.action = None
-        self.petting_counter = 0
-        self.emoji = ''
-
-        # stats
-        self.hunger = MAX_HUNGER_VALUE // 2
-        self.thirst = MAX_THIRST_VALUE // 2
-        self.poopy = MAX_POOPY_VALUE // 2
-        self.boredom = MAX_BOREDOM_VALUE // 2
-
         self.change_emoji('👋')
         self.time_loop()
-
-    # ------------------------------------------- overloaded methods -----------------------------------------
 
     @decorators.repeal
     def onLoggedIn(self, email=None):
@@ -58,13 +40,13 @@ class AdolfBot(fb.Client, MemoryMixin):
         if thread_id != ELITE_GROUP_ID:
             return
 
-        if self.action == Action.PETTING:
+        if memory.action == Action.PETTING:
             if status == fb.TypingStatus.TYPING:
                 response = texts.happy_cat_sound + '😺'
                 self.sendMessage(response, thread_id=thread_id, thread_type=thread_type)
-                self.petting_counter -= 1
-                if self.petting_counter <= 0:
-                    self.action = None
+                memory.petting_counter -= 1
+                if memory.petting_counter <= 0:
+                    memory.action = None
                     self.sendMessage(texts.thanks_petting, thread_id=thread_id, thread_type=thread_type)
             elif status == fb.TypingStatus.STOPPED:
                 self.sendMessage(texts.stop_petting, thread_id=thread_id, thread_type=thread_type)
@@ -72,9 +54,9 @@ class AdolfBot(fb.Client, MemoryMixin):
     @decorators.elite_group_only
     def onEmojiChange(self, mid=None, author_id=None, new_emoji=None, thread_id=None,
                       thread_type=fb.ThreadType.USER, ts=None, metadata=None, msg=None):
-        if new_emoji != self.emoji:
+        if new_emoji != memory.emoji:
             self.sendMessage(texts.dont_change_emoji, thread_id=thread_id, thread_type=fb.ThreadType.GROUP)
-            self.changeThreadEmoji(self.emoji, thread_id)
+            self.changeThreadEmoji(memory.emoji, thread_id)
 
     @decorators.elite_group_only
     def onTitleChange(self, mid=None, author_id=None, new_title=None, thread_id=None,
@@ -120,7 +102,7 @@ class AdolfBot(fb.Client, MemoryMixin):
     # ------------------------------------------- own methods -----------------------------------------
 
     def change_emoji(self, emoji):
-        self.emoji = emoji
+        memory.emoji = emoji
         self.changeThreadEmoji(emoji, ELITE_GROUP_ID)
 
     def meow_stranger(self, thread_id, thread_type):
@@ -135,18 +117,18 @@ class AdolfBot(fb.Client, MemoryMixin):
         threading.Timer(TIME_UPDATE_INTERVAL, self.time_loop).start()
 
     def update_state(self):
-        self.hunger -= 1
-        self.thirst -= 1
-        self.poopy -= 1
-        self.boredom -= 1
+        memory.hunger -= 1
+        memory.thirst -= 1
+        memory.poopy -= 1
+        memory.boredom -= 1
 
-        if self.hunger == 0:
+        if memory.hunger == 0:
             self.sendMessage(texts.meal_need, thread_id=ELITE_GROUP_ID, thread_type=fb.ThreadType.GROUP)
-        elif self.thirst == 0:
+        elif memory.thirst == 0:
             self.sendMessage(texts.drink_need, thread_id=ELITE_GROUP_ID, thread_type=fb.ThreadType.GROUP)
-        elif self.boredom == 0:
+        elif memory.boredom == 0:
             self.sendMessage(texts.toy_need, thread_id=ELITE_GROUP_ID, thread_type=fb.ThreadType.GROUP)
-        elif self.poopy == 0:
+        elif memory.poopy == 0:
             self.sendMessage(texts.poopy_need, thread_id=ELITE_GROUP_ID, thread_type=fb.ThreadType.GROUP)
 
     @staticmethod
